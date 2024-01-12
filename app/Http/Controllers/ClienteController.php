@@ -129,8 +129,8 @@ class ClienteController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 "status" => "error",
-                "message" => $e->getMessage()
-            ]);
+                "message" => "No se eliminó el cliente porque está registrado en una o más ordenes de compra" //$e->getMessage()
+            ],400);
         }
 
         return response()->json([

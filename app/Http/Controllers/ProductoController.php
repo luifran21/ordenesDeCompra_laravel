@@ -44,7 +44,7 @@ class ProductoController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'nombre' => 'required',
-            'precio' => 'required|numeric',
+            'precio' => 'required|numeric|min:0',
             'unidades_de_medida' => 'required',
             'descripcion' => 'required'
         ]);
@@ -97,7 +97,7 @@ class ProductoController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'nombre' => 'nullable',
-            'precio' => 'nullable|numeric',
+            'precio' => 'nullable|numeric|min:0',
             'unidades_de_medida' => 'nullable',
             'descripcion' => 'nullable'
         ]);
@@ -106,7 +106,7 @@ class ProductoController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => $validator->errors()->first()
-            ]);
+            ],400);
         }
 
         try {
@@ -138,17 +138,21 @@ class ProductoController extends Controller
     public function destroy(Producto $producto)
     {
         try{
-            $producto->delete();
+            if($producto->deleteOrFail()){
+                return response()->json([
+                    "status" => "ok",
+                    "message" => "Producto eliminado correctamente."
+                ],200);
+            }
+            return response()->json([
+                "status" => "ok",
+                "message" => "Producto no eliminado."
+            ],400);
         }catch(\Exception $e){
             return response()->json([
                 "status" => "error",
-                "message" => $e->getMessage()
-            ]);
+                "message" => "No se eliminó el producto porque está registrado en una o más ordenes de compra"//$e->getMessage()
+            ],400);
         }
-
-        return response()->json([
-            "status" => "ok",
-            "message" => "Producto eliminado correctamente"
-        ]);
     }
 }

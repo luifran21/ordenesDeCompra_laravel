@@ -19,8 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('producto_id');
             $table->timestamps();
 
-            $table->foreign('orden_compra_id')->references('id')->on('orden_compras')->onDelete('cascade');
-            $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
+            $table->foreign('orden_compra_id')->references('id')->on('orden_compras')->onDelete('restrict');
+            $table->foreign('producto_id')->references('id')->on('productos')->onDelete('restrict');
         });
     }
 
