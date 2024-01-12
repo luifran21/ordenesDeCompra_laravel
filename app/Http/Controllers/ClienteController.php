@@ -12,7 +12,11 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        //
+        $clientes = Cliente::paginate(10);
+        return response()->json([
+            "status" => true,
+            "results" => $clientes
+        ],200);
     }
     public function getSugerencias(Request $request)
     {
@@ -37,7 +41,32 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = \Validator::make($request->all(),[
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'direccion' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => true,
+                'message' => $validator->errors()->first()
+            ],400);
+        }
+
+        $cliente = Cliente::create($request->all());
+
+        if(isset($cliente)){
+            return response()->json([
+                'status' => true,
+                'message' => "Cliente registrado correctamente."
+            ],200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Ocurrio un error al registrar el cliente"
+        ],400);
     }
 
     /**
@@ -61,7 +90,33 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        //
+        $validator = \Validator::make($request->all(),[
+            'nombre' => 'nullable',
+            'apellido' => 'nullable',
+            'direccion' => 'nullable'
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => true,
+                'message' => $validator->errors()->first()
+            ],400);
+        }
+
+        $cliente->update($request->all());
+        $cliente->save();
+
+        if(isset($cliente)){
+            return response()->json([
+                'status' => true,
+                'message' => "Cliente actualizado correctamente."
+            ],200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Ocurrio un error al registrar el cliente"
+        ],400);
     }
 
     /**
@@ -69,6 +124,18 @@ class ClienteController extends Controller
      */
     public function destroy(Cliente $cliente)
     {
-        //
+        try{
+            $cliente->delete();
+        }catch(\Exception $e){
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response()->json([
+            "status" => "ok",
+            "message" => "Cliente eliminado correctamente"
+        ]);
     }
 }

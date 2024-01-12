@@ -12,7 +12,7 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $products = Producto::all();
+        $products = Producto::paginate(10);
 
         return response()->json([
             "status" => True,
@@ -21,7 +21,7 @@ class ProductoController extends Controller
     }
     public function getSugerencias(Request $request)
     {
-        $productos = Producto::where('nombre','like', "%".$request->clave."%")->take(5)->get();
+        $productos = Producto::where('nombre', 'like', "%" . $request->clave . "%")->take(5)->get();
 
         return response()->json([
             "status" => "ok",
@@ -42,7 +42,33 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = \Validator::make($request->all(), [
+            'nombre' => 'required',
+            'precio' => 'required|numeric',
+            'unidades_de_medida' => 'required',
+            'descripcion' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => true,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        $producto = Producto::create($request->all());
+
+        if (isset($producto)) {
+            return response()->json([
+                'status' => true,
+                'message' => "Producto registrado correctamente."
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => "Error al registrar el producto"
+        ], 400);
     }
 
     /**
@@ -50,7 +76,10 @@ class ProductoController extends Controller
      */
     public function show(Producto $producto)
     {
-        //
+        return response()->json([
+            "status" => true,
+            "producto" => $producto
+        ],200);
     }
 
     /**
@@ -66,7 +95,41 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        //
+        $validator = \Validator::make($request->all(), [
+            'nombre' => 'nullable',
+            'precio' => 'nullable|numeric',
+            'unidades_de_medida' => 'nullable',
+            'descripcion' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => true,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        try {
+            $producto->update($request->all());
+            $producto->save();
+
+            if (isset($producto)) {
+                return response()->json([
+                    'status' => true,
+                    'message' => "Producto actualizado correctamente."
+                ], 200);
+            }
+        }catch(\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => "Error al registrar el producto. ".$e->getMessage(),
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => "Error al registrar el producto"
+        ], 400);
     }
 
     /**
@@ -74,6 +137,18 @@ class ProductoController extends Controller
      */
     public function destroy(Producto $producto)
     {
-        //
+        try{
+            $producto->delete();
+        }catch(\Exception $e){
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response()->json([
+            "status" => "ok",
+            "message" => "Producto eliminado correctamente"
+        ]);
     }
 }

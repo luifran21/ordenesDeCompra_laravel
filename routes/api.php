@@ -29,9 +29,17 @@ Route::controller(OrdenCompraController::class)->group(function() {
 
 Route::controller(ProductoController::class)->group(function() {
     Route::get('/products', 'index');
-    Route::get('/products/sugerencias', 'getSugerencias');
+    Route::get('/products/{producto}', 'show');
+    Route::get('/products_sugerencias', 'getSugerencias');
+    Route::post('/products','store');
+    Route::put('/products/{producto}', 'update');
+    Route::delete('/products/{producto}', 'destroy');
 });
 
 Route::controller(ClienteController::class)->group(function() {
     Route::get('/clientes/sugerencias', 'getSugerencias');
+    Route::get('/clientes', 'index');
+    Route::post('/clientes','store');
+    Route::put('/clientes/{cliente}', 'update');
+    Route::delete('/clientes/{cliente}', 'destroy');
 });
