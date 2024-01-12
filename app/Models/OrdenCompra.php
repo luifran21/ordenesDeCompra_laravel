@@ -17,17 +17,17 @@ class OrdenCompra extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class);
+        return $this->belongsTo(Cliente::class,'cliente_id');
     }
 
-    public function getDetallesCompra(){
-        return $this->hasMany(DetalleCompra::class);
+    public function detallesCompra(){
+        return $this->hasMany(DetalleCompra::class)->with('producto');
     }
 
     public function registrarDetalles(Array $detalles){
         $detalleCompraController = new DetalleCompraController();
 
-        $detalles_db = $detalleCompraController->registrarDetalles($detalles, $this); // hacer la funcion en el controller
+        $detalles_db = $detalleCompraController->registrarDetalles($detalles, $this);
         
         if (count($detalles_db) > 0) {
             return True;

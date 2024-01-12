@@ -14,6 +14,15 @@ class ClienteController extends Controller
     {
         //
     }
+    public function getSugerencias(Request $request)
+    {
+        $clientes = Cliente::where('nombre','like', "%".$request->clave."%")->take(5)->get();
+
+        return response()->json([
+            "status" => "ok",
+            "results" => $clientes
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.

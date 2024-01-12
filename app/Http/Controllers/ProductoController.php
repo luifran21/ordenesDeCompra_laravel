@@ -12,7 +12,21 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        //
+        $products = Producto::all();
+
+        return response()->json([
+            "status" => True,
+            "results" => $products
+        ]);
+    }
+    public function getSugerencias(Request $request)
+    {
+        $productos = Producto::where('nombre','like', "%".$request->clave."%")->take(5)->get();
+
+        return response()->json([
+            "status" => "ok",
+            "results" => $productos
+        ]);
     }
 
     /**
